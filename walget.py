@@ -1,11 +1,9 @@
 # Pulls down wallhaven home page and extracts image codes of top papes
 import sys
 import os
-import exrex
 import re
 import random
 import urllib.request
-import pywal
 
 # Return url with images
 def geturl ():
@@ -30,7 +28,6 @@ def getFile (url):
 # https://th.wallhaven.cc/small/6k/6kyk9w.jpg
 # turns into:
 # https://w.wallhaven.cc/full/39/wallhaven-39gogv.jpg
-
 
 def getImageLinks (html):
     thumbs = re.findall ('img src="[^"<>]*"', html)
