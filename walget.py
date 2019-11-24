@@ -7,7 +7,7 @@ import random
 import urllib.request
 import pywal
 
-
+# Return url with images
 def geturl ():
     #d = exrex.getone ('([a-z]|[0-9]){2}')
     #affix = exrex.getone ('([a-z]|[0-9]){6}')
@@ -15,31 +15,45 @@ def geturl ():
     url = 'https://wallhaven.cc/'
     return url
 
+# Append 6 character code on wallhaven url
 def getCodeUrl (code):
     return 'https://wallhaven.cc/w/' + code
 
+# pulls html from url
 def getFile (url):
     req = urllib.request.Request (url, headers={'User-Agent': 'Mozilla/5.0'})
     html = urllib.request.urlopen (req).read ().decode ('utf-8')
     return html
 
 # finds all "lg-thumb" spans in html and extracts the 6 character code
-def getImageCodes (html):
-    thumbs = re.findall ('<span class="lg-thumb"><a href="[^"><]*">', html)
+# sample link
+# https://th.wallhaven.cc/small/6k/6kyk9w.jpg
+# turns into:
+# https://w.wallhaven.cc/full/39/wallhaven-39gogv.jpg
+
+
+def getImageLinks (html):
+    thumbs = re.findall ('img src="[^"<>]*"', html)
     thumblist = []
-    for thumb in thumbs:
-        thumb = re.sub ('<span class="lg-thumb"><a href="https://wallhaven.cc/w/', '', thumb)
-        thumb = re.sub ('">', '', thumb)
-        thumblist.append (thumb)
+    for thumb in thumbs:        
+        if "user" in thumb:
+            continue
+        # A lot of unfortuante regex subs to turn a thumbnail link to full size image link
+        # It sucks, but it works 
+        try:
+            thumb = re.sub ('img src=', '', thumb)
+            thumb = re.sub ('/th.', '/w.', thumb)
+            thumb = re.sub ('/small/', '/full/', thumb)
+            thumb = re.sub ('/lg/', "/full/", thumb)
+            code = re.search ('\w{6}.jpg', thumb).group ()
+            thumb = re.sub ('\w{6}.jpg', "wallhaven-" + code, thumb)
+            thumb = re.sub ('"', '', thumb)
+            thumblist.append (thumb)
+        except Exception as e:
+            print (e)
     return thumblist
 
-# Another regex sub to extract full link
-def getImageLink (html):
-    wallpaper = re.search ('<img id="wallpaper" src="https://w.wallhaven.cc/full/.{2}/wallhaven-.{6}.jpg"', html).group ()
-    wallpaper = re.sub ('<img id="wallpaper" src="', '', wallpaper)
-    wallpaper = re.sub ('"', '', wallpaper)
-    return wallpaper
-
+# Downloads the image from url
 def downloadImage (url):
     req = urllib.request.Request(url, headers={'User-Agent' : "Magic Browser"}) 
     image = urllib.request.urlopen (req).read ()
@@ -50,12 +64,10 @@ def main ():
     # Get homepage html
     html = getFile (geturl ())
     # Find top image codes
-    codes = getImageCodes (html)
+    links = getImageLinks (html)
     # Extract Code URL at random
-    html = getFile (getCodeUrl (random.choice (codes)))
     # Download the image
-    wallpaper = getImageLink (html)
-    image = downloadImage (wallpaper)
+    image = downloadImage (random.choice (links))
     f = open ("image.jpg", "wb")
     f.write (image)
     f.close ()
