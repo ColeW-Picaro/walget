@@ -46,47 +46,6 @@ def downloadImage (url):
     #urllib.request.Request (url, headers={'User-Agent': 'Mozilla/5.0'})
     return image
 
-# Taken almost directly from the pywal wiki
-def walImage ():
-    """Main function."""
-    CACHE_DIR = os.path.join(os.environ["HOME"], ".cache/wal")
-    # Validate image and pick a random image if a
-    # directory is given below.
-    image = pywal.image.get("image.jpg")
-
-    # Return a dict with the palette.
-    # Set quiet to 'True' to disable notifications.
-    colors = pywal.colors.get(image)
-    print (colors)
-
-    # Apply the palette to all open terminals.
-    # Second argument is a boolean for VTE terminals.
-    # Set it to true if the terminal you're using is
-    # VTE based. (xfce4-terminal, termite, gnome-terminal.)
-
-
-    pywal.export.every(colors)
-    
-    # Export individual template files.
-    pywal.export.color(colors, "xresources", 
-                       os.path.join(CACHE_DIR, "colors.xresources"))
-    pywal.export.color(colors, "shell", 
-                       os.path.join(CACHE_DIR, "colors.bash"))
-
-    pywal.sequences.send(colors, CACHE_DIR)
-
-    # Reload xrdb, i3 and polybar.
-    pywal.reload.env()
-
-    # Reload individual programs.
-    pywal.reload.i3()
-    pywal.reload.polybar()
-    pywal.reload.xrdb()
-
-    # Set the wallpaper.
-    pywal.wallpaper.change(image)
-    return
-
 def main ():
     # Get homepage html
     html = getFile (geturl ())
@@ -99,9 +58,7 @@ def main ():
     image = downloadImage (wallpaper)
     f = open ("image.jpg", "wb")
     f.write (image)
-    # Run it through pywal
-    walImage ()
     f.close ()
-
+    return
 
 main ()
