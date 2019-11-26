@@ -8,9 +8,14 @@ import urllib.request
 # Global function: Used by all classes
 # pulls html from url
 def getHtml (url):
-    req = urllib.request.Request (url, headers={'User-Agent': 'Mozilla/5.0'})
-    html = urllib.request.urlopen (req).read ().decode ('utf-8')
-    return html
+    try:
+        req = urllib.request.Request (url, headers={'User-Agent': 'Mozilla/5.0'})
+        html = urllib.request.urlopen (req).read ().decode ('utf-8')
+        return html
+    except urllib.error.URLError as e:
+        print (e)
+        exit ()
+
 
 # Global function: Used by all classes
 # Downloads the image from url
@@ -20,7 +25,7 @@ def getImage (url):
         image = urllib.request.urlopen (req).read ()
         #urllib.request.Request (url, headers={'User-Agent': 'Mozilla/5.0'})
         return image
-    except URLError as e:
+    except urllib.error.URLError as e:
         print (e)
         return 0
 
