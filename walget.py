@@ -63,16 +63,27 @@ class wallhaven ():
             # A lot of unfortuante regex subs to turn a thumbnail link to full size image link
             # It sucks, but it works 
             try:
+                # get rid of html tag
                 thumb = re.sub ('img src=', '', thumb)
+                # replace /th. with /w.
+                # ie. https://th.wallhaven.cc -> https://w.wallhaven.cc
                 thumb = re.sub ('/th.', '/w.', thumb)
+                # Replace /small/ or /lg/ with /full/
+                # ie. https://w.wallhaven.cc/small/ -> https://w.wallhaven.cc/full/
                 thumb = re.sub ('/small/', '/full/', thumb)
                 thumb = re.sub ('/lg/', "/full/", thumb)
+                # Extract 6 character identifier + .jpg
                 code = re.search ('\w{6}.jpg', thumb).group ()
+                # prepend wallhaven- to it
+                # ie. https://w.wallhaven.cc/full/aaaaaa.jpg ->
+                #     https://w.wallhaven.cc/full/wallhaven-aaaaaa.jpg
                 thumb = re.sub ('\w{6}.jpg', "wallhaven-" + code, thumb)
+                # get rid of surrounding quotes from html
                 thumb = re.sub ('"', '', thumb)
+                # append it to the thumbnail list
                 self.thumblist.append (thumb)
             except Exception as e:
-                print (thumb)                
+                print (thumb)
         return
         
 def main ():
